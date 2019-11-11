@@ -1,0 +1,91 @@
+#main{
+    margin:  100px auto;
+}
+.level{
+    text-align: center;
+    margin-bottom: 10px
+}
+.level button{
+    padding: 5px 15px;
+    background: #1565C0;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+.level button.active{
+    background: #00abff;
+
+}
+table{
+    border-spacing: 1px;
+    background-image: linear-gradient(to bottom right, #B3E5FC, #3644BE);
+    margin: 0 auto;
+}
+td{
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    background: rgba(255,255,255,0);
+    border: 2px solid;
+    border-color: #95CCF6 #3644BE #3644BE #95CCF6;
+    text-align: center;
+    line-height: 20px;
+}
+td.zero{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+}
+td.one{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+    color: #0332fe;
+}
+td.two{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+    color: #019f02;
+}
+td.three{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+    color: #ff2600;
+}
+td.four{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+    color: #93208f;
+}
+td.five{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+    color: #ff7f29;
+}
+td.six{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+    color: #ff3fff;
+}
+td.seven{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+    color: #3fffbf;
+}
+td.eight{
+    border-color: #E1F5FE;
+    background: #E1F5FE;
+    color: #22ee0f;
+}
+.info{
+    text-align: center;
+    margin-top: 10px;
+}
+.mine {
+    background: #E1F5FE url(../img/bg3.png) no-repeat center;
+    background-size:cover;
+}
+.flag{
+    background: #E3F2FD url(../img/bg2.png) no-repeat center;
+    background-size:cover;
+}
