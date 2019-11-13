@@ -56,6 +56,6 @@
     border-radius: 50%;
 }
 .food{
-    background-image: url('../images/food1.png');
-    background-size: cover;
+    background: url('../images/food2.png') no-repeat;
+    background-size: 100% 100%;
 }
