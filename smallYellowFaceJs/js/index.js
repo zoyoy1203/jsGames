@@ -267,11 +267,11 @@ function jixu(){
 
 var bodyobj=document.getElementsByTagName("body")[0];
 if(document.addEventListener){
-    //为本方飞机添加移动和暂停
+    //为本方白大王添加移动和暂停
     mainDiv.addEventListener("mousemove",move,true);
-    //为本方飞机添加暂停事件
+    //为本方白大王添加暂停事件
     selfking.imagenode.addEventListener("click",pauseG,true);
-    //为body添加判断本方飞机移出边界事件
+    //为body添加判断本方白大王移出边界事件
     bodyobj.addEventListener("mousemove",boundary,true);
     //为暂停界面的继续按钮添加暂停事件
     suspenddiv.getElementsByTagName("button")[0].addEventListener("click",pauseG,true);
@@ -279,11 +279,11 @@ if(document.addEventListener){
     suspenddiv.getElementsByTagName("button")[1].addEventListener("click",jixu,true);
 }
 else if(document.attachEvent){
-    //为本方飞机添加移动
+    //为本方白大王添加移动
     mainDiv.attachEvent("onmousemove",move);
-    //为本方飞机添加暂停事件
+    //为本方白大王添加暂停事件
     selfking.imagenode.attachEvent("onclick",pauseG);
-    //为body添加判断本方飞机移出边界事件
+    //为body添加判断本方白大王移出边界事件
     bodyobj.attachEvent("onmousemove",boundary);
     //为暂停界面的继续按钮添加暂停事件
     suspenddiv.getElementsByTagName("button")[0].attachEvent("onclick",pauseG);
@@ -292,7 +292,7 @@ else if(document.attachEvent){
 }
 
 
-//初始化隐藏本方飞机
+//初始化隐藏本方白大王
 selfking.imagenode.style.display="none";
 
 // 敌机对象数组
@@ -362,7 +362,7 @@ function start(){
     // }
     mark++;
   
-    // 创建敌方飞机
+    // 创建敌方小黄脸
     // 循环20次，创建一个黄脸。 根据循环总次数取余值，创建不同阶段的黄脸
     if(mark==20){
         mark1++;
@@ -439,11 +439,11 @@ function start(){
     // 碰撞检测
     for(var k=0;k<bulletslen;k++){
         for(var j=0;j<enemyslen;j++){
-            //判断碰撞本方飞机
+            //判断碰撞本方白大王
             if(enemys[j].faceisdie==false){
                 if(enemys[j].imagenode.offsetLeft+enemys[j].facesizeX>=selfking.imagenode.offsetLeft&&enemys[j].imagenode.offsetLeft<=selfking.imagenode.offsetLeft+selfking.facesizeX){
                   if(enemys[j].imagenode.offsetTop+enemys[j].facesizeY>=selfking.imagenode.offsetTop+40&&enemys[j].imagenode.offsetTop<=selfking.imagenode.offsetTop-20+selfking.facesizeY){
-                      //碰撞本方飞机，游戏结束，统计分数
+                      //碰撞本方白大王，游戏结束，统计分数
                       selfking.imagenode.src="images/die5.png";
                       enddiv.style.display="block";
                       score.innerHTML=scores;
