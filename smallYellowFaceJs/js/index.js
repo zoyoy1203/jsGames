@@ -201,7 +201,7 @@ var ourkingChange = function() {
 
 // 暂停事件
 var number = 0;  // 控制暂停和开始之间的转换
-var pause = function() {
+var pauseG = function() {
     if(number==0){
         clearInterval(musicState);
         music.pause();
@@ -270,11 +270,11 @@ if(document.addEventListener){
     //为本方飞机添加移动和暂停
     mainDiv.addEventListener("mousemove",move,true);
     //为本方飞机添加暂停事件
-    selfking.imagenode.addEventListener("click",pause,true);
+    selfking.imagenode.addEventListener("click",pauseG,true);
     //为body添加判断本方飞机移出边界事件
     bodyobj.addEventListener("mousemove",boundary,true);
     //为暂停界面的继续按钮添加暂停事件
-    suspenddiv.getElementsByTagName("button")[0].addEventListener("click",pause,true);
+    suspenddiv.getElementsByTagName("button")[0].addEventListener("click",pauseG,true);
     //为暂停界面的返回主页按钮添加事件
     suspenddiv.getElementsByTagName("button")[1].addEventListener("click",jixu,true);
 }
@@ -282,11 +282,11 @@ else if(document.attachEvent){
     //为本方飞机添加移动
     mainDiv.attachEvent("onmousemove",move);
     //为本方飞机添加暂停事件
-    selfking.imagenode.attachEvent("onclick",pause);
+    selfking.imagenode.attachEvent("onclick",pauseG);
     //为body添加判断本方飞机移出边界事件
     bodyobj.attachEvent("onmousemove",boundary);
     //为暂停界面的继续按钮添加暂停事件
-    suspenddiv.getElementsByTagName("button")[0].attachEvent("onclick",pause);
+    suspenddiv.getElementsByTagName("button")[0].attachEvent("onclick",pauseG);
     //为暂停界面的返回主页按钮添加事件
     suspenddiv.getElementsByTagName("button")[1].attachEvent("click",jixu,true);
 }
@@ -450,10 +450,12 @@ function start(){
                       if(document.removeEventListener){
                           mainDiv.removeEventListener("mousemove",move,true);
                           bodyobj.removeEventListener("mousemove",boundary,true);
+                          selfking.imagenode.removeEventListener("click",pauseG,true);
                       }
                       else if(document.detachEvent){
                           mainDiv.detachEvent("onmousemove",move);
                           bodyobj.removeEventListener("mousemove",boundary,true);
+                          selfking.imagenode.removeEventListener("click",pauseG,true);
                       }
                       clearInterval(set);
                       clearInterval(ourkingC);
