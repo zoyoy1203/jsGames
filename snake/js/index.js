@@ -196,29 +196,25 @@ function createFood(){
     while(include){
         x = Math.round(Math.random()*(td-1));
         y = Math.round(Math.random()*(tr-1));
-
         snake.pos.forEach(function(value){
             if(x!=value[0] && y!=value[1]){
                 //  坐标不在蛇身上
                 include = false;
             }
         })
-        // 生成食物
-        food = new Square(x,y,'food');
-        food.pos = [x,y];  // 存储食物的坐标，用于跟蛇头下一个走的点作对比
-
-        var foodDom = document.querySelector('.food');
-        if(foodDom){
-            foodDom.style.left = x*sw +'px';
-            foodDom.style.top = y*sh +'px';
-        }else{
-            food.create();
-        }
-   
     }
+    // 生成食物
+    food = new Square(x,y,'food');
+    food.pos = [x,y];  // 存储食物的坐标，用于跟蛇头下一个走的点作对比
 
+    var foodDom = document.querySelector('.food');
+    if(foodDom){
+        foodDom.style.left = x*sw +'px';
+        foodDom.style.top = y*sh +'px';
+    }else{
+        food.create();
+    }
 }
-
 
 // 创建游戏逻辑
 function Game(){
