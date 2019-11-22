@@ -28,12 +28,9 @@ var diefaceState3;
 // 歌曲列表数组
 var sounds = [
     "sound/Axero - Trip.mp3",
-    "sound/ConsoulTrainin-TakeMeToInfinity.mp3",
-    "sound/Es rappelt im Karton.mp3",
     "sound/that girl.mp3",
     "sound/Wicked Wonderland.mp3",
     "sound/你打不过我吧.mp3",
-    "sound/讲真的.mp3",
 ]
 
 var soundsnum = sounds.length;
@@ -371,18 +368,18 @@ function start(){
         if(mark1%5==0){
             var m = random(0,7);
             //                   hp,a,b,sizeX,sizeY,score,dietime,sudu,boomimage,imagesrc
-            enemys.push(new enemy(4,40,1220,80,80,5000,360,random(1,3),boomimg[0],faceimgM[m],2));
+            enemys.push(new enemy(4,40,1120,80,80,5000,360,random(1,3),boomimg[0],faceimgM[m],2));
         }
         //大黄脸
         if(mark1==20){
             var b = random(0,2);
-            enemys.push(new enemy(8,60,1200,150,160,30000,360,1,boomimg[0],faceimgB[b],3));
+            enemys.push(new enemy(8,60,1100,150,160,30000,360,1,boomimg[0],faceimgB[b],3));
             mark1=0;
         }
         //小黄脸
         else{
             var s = random(0,21);
-            enemys.push(new enemy(1,20,1230,50,50,1000,360,random(1,4),boomimg[0],faceimgS[s],1));
+            enemys.push(new enemy(1,20,1180,50,50,1000,360,random(1,4),boomimg[0],faceimgS[s],1));
         }
         mark=0;
     }
