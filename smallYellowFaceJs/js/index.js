@@ -12,12 +12,57 @@ var suspenddiv=document.getElementById("suspenddiv");
 var enddiv=document.getElementById("enddiv");
 //获得游戏结束界面的分数标签
 var score=document.getElementById("score");
+//获取右上角上一首歌曲按钮
+var lastMusic = document.getElementById("lastMusic");
+//获取右上角下一首歌曲按钮
+var nextMusic = document.getElementById("nextMusic");
+// 获取audio
+var music = document.getElementById("audio");
+// 获取敌方小黄脸死亡声音
+var dieface1 = document.getElementById("audio1");
+var dieface11 = document.getElementById("audio11");
+var dieface2 = document.getElementById("audio2");
+var dieface3 = document.getElementById("audio3");
+
+// 歌曲列表数组
+var sounds = [
+    "sound/Axero - Trip.mp3",
+    "sound/ConsoulTrainin-TakeMeToInfinity.mp3",
+    "sound/Es rappelt im Karton.mp3",
+    "sound/that girl.mp3",
+    "sound/Wicked Wonderland.mp3",
+    "sound/你打不过我吧.mp3",
+    "sound/讲真的.mp3",
+]
+
+var soundsnum = sounds.length;
+var soundsindex = 0;
+function lastM() {
+    clearInterval(musicState);
+    music.pause();
+    if(soundsindex == 0){
+        soundsindex = soundsnum-1;
+    }else{
+        soundsindex --;
+    }
+    music.src=sounds[soundsindex];
+}
+function nextM() {
+    clearInterval(musicState);
+    music.pause();
+    if(soundsindex == soundsnum-1){
+        soundsindex = 0
+    }else{
+        soundsindex ++;
+    }
+    music.src=sounds[soundsindex];
+}
 
 //初始化分数
 var scores=0;
 
 // 创建小黄脸和玩家公共类
-function face(hp,X,Y,sizeX,sizeY,score,dietime,speed,boomimage,imagesrc){
+function face(hp,X,Y,sizeX,sizeY,score,dietime,speed,boomimage,imagesrc,kind){
     this.faceX = X;
     this.faceY = Y;
     this.imagenode = null;
@@ -30,6 +75,7 @@ function face(hp,X,Y,sizeX,sizeY,score,dietime,speed,boomimage,imagesrc){
     this.facedietimes = 0; // 记录死亡时间 （死了多久）
     this.facedietime = dietime;  // 规定的死亡时间
     this.facespeed = speed;  // 速度
+    this.facekind = kind; // 类型   0：我方白大王，  1：小黄脸  2：中黄脸  3：大黄脸
 
     // 移动行为 ： 不同分数段，不同速度
     this.facemove = function() {
@@ -98,8 +144,8 @@ function oddbullet(X,Y){
 }
 
 //创建敌方小黄脸类
-function enemy(hp,a,b,sizeX,sizeY,score,dietime,speed,boomimage,imagesrc){
-    face.call(this,hp,random(a,b),-100,sizeX,sizeY,score,dietime,speed,boomimage,imagesrc);
+function enemy(hp,a,b,sizeX,sizeY,score,dietime,speed,boomimage,imagesrc,kind){
+    face.call(this,hp,random(a,b),-100,sizeX,sizeY,score,dietime,speed,boomimage,imagesrc,kind);
 }
 
 //产生min到max之间的随机数
@@ -111,13 +157,14 @@ function random(min,max){
 function ourking(X,Y){
     var imagesrc="images/k1.gif";
     //            hp,X,Y,sizeX,sizeY,score,dietime,speed,boomimage,imagesrc
-    face.call(this,1,X,Y,66,80,0,660,0,"image/die3.gif",imagesrc);
+    face.call(this,1,X,Y,66,80,0,660,0,"image/die3.gif",imagesrc,0);
     this.imagenode.setAttribute('id','ourking');
 }
 
 // 创建我方白大王
 var selfking = new ourking(692,600);
 
+//  创建我方dom元素
 var ourking = document.getElementById("ourking");
 
 // 移动事件
@@ -129,11 +176,33 @@ var move = function() {
     ourking.style.left=selfkingX-selfking.facesizeX/2+"px";
     ourking.style.top=selfkingY-selfking.facesizeY/2+"px";
 }
+// 白大王动态效果
+var ourkingImg = [
+    "images/k2.gif",
+    "images/k3.gif",
+    "images/k4.gif",
+    "images/k5.gif",
+]
+var num = 0;
+var ourkingChange = function() {
+    num ++;
+    if(num == 20){
+        ourking.src = ourkingImg[1];
+    }else if(num == 40){
+        ourking.src = ourkingImg[2];
+    }else if(num == 60){
+        ourking.src = ourkingImg[3];
+    }else if(num == 80){
+        num = 0;
+    }
+}
+
 
 // 暂停事件
 var number = 0;  // 控制暂停和开始之间的转换
 var pause = function() {
     if(number==0){
+        console.log("1");
         clearInterval(musicState);
         music.pause();
         suspenddiv.style.display="block";  // 暂停栏目显示
@@ -146,10 +215,12 @@ var pause = function() {
             bodyobj.detachEvent("onmousemove",boundary);
         }
         clearInterval(set);
+        clearInterval(ourkingC);
         number=1;
     }
     else{
-        musicState = setInterval("toggleSound()",1);
+        console.log("2");
+        musicState = setInterval(toggleSound(music),1);
         suspenddiv.style.display="none";
         if(document.addEventListener){
             mainDiv.addEventListener("mousemove",move,true);
@@ -160,6 +231,7 @@ var pause = function() {
             bodyobj.attachEvent("onmousemove",boundary);
         }
         set=setInterval(start,20);
+        ourkingC = setInterval(ourkingChange,20);
         number=0;
     }
 }
@@ -193,13 +265,6 @@ function jixu(){
 }
 
 
-//暂停界面重新开始事件
-//function chongxinkaishi(){
-//    location.reload(true);
-//    startdiv.style.display="none";
-//    maindiv.style.display="block";
-//}
-
 
 var bodyobj=document.getElementsByTagName("body")[0];
 if(document.addEventListener){
@@ -211,9 +276,8 @@ if(document.addEventListener){
     bodyobj.addEventListener("mousemove",boundary,true);
     //为暂停界面的继续按钮添加暂停事件
     suspenddiv.getElementsByTagName("button")[0].addEventListener("click",pause,true);
-//  suspenddiv.getElementsByTagName("button")[1].addEventListener("click",chongxinkaishi,true);
     //为暂停界面的返回主页按钮添加事件
-    suspenddiv.getElementsByTagName("button")[2].addEventListener("click",jixu,true);
+    suspenddiv.getElementsByTagName("button")[1].addEventListener("click",jixu,true);
 }
 else if(document.attachEvent){
     //为本方飞机添加移动
@@ -224,9 +288,8 @@ else if(document.attachEvent){
     bodyobj.attachEvent("onmousemove",boundary);
     //为暂停界面的继续按钮添加暂停事件
     suspenddiv.getElementsByTagName("button")[0].attachEvent("onclick",pause);
-//    suspenddiv.getElementsByTagName("button")[1].attachEvent("click",chongxinkaishi,true);
     //为暂停界面的返回主页按钮添加事件
-    suspenddiv.getElementsByTagName("button")[2].attachEvent("click",jixu,true);
+    suspenddiv.getElementsByTagName("button")[1].attachEvent("click",jixu,true);
 }
 
 
@@ -309,18 +372,18 @@ function start(){
         if(mark1%5==0){
             var m = random(0,7);
             //                   hp,a,b,sizeX,sizeY,score,dietime,sudu,boomimage,imagesrc
-            enemys.push(new enemy(4,40,1220,80,80,5000,360,random(1,3),boomimg[0],faceimgM[m]));
+            enemys.push(new enemy(4,40,1220,80,80,5000,360,random(1,3),boomimg[0],faceimgM[m],2));
         }
         //大黄脸
         if(mark1==20){
             var b = random(0,2);
-            enemys.push(new enemy(8,60,1200,150,160,30000,360,1,boomimg[0],faceimgB[b]));
+            enemys.push(new enemy(8,60,1200,150,160,30000,360,1,boomimg[0],faceimgB[b],3));
             mark1=0;
         }
         //小黄脸
         else{
             var s = random(0,21);
-            enemys.push(new enemy(1,20,1230,50,50,1000,360,random(1,4),boomimg[0],faceimgS[s]));
+            enemys.push(new enemy(1,20,1230,50,50,1000,360,random(1,4),boomimg[0],faceimgS[s],1));
         }
         mark=0;
     }
@@ -349,7 +412,6 @@ function start(){
                 enemys[i].imagenode.src = boomimg[2]
             }
             if(enemys[i].facedietimes==enemys[i].facedietime){  // 达到规定的死亡等候时间了 
-                console.log("-------------")
                 mainDiv.removeChild(enemys[i].imagenode);
                 enemys.splice(i,1);
                 enemyslen--;
@@ -376,6 +438,7 @@ function start(){
     }
 
     // 碰撞检测
+    var diefaceFlag = true;
     for(var k=0;k<bulletslen;k++){
         for(var j=0;j<enemyslen;j++){
             //判断碰撞本方飞机
@@ -395,6 +458,9 @@ function start(){
                           bodyobj.removeEventListener("mousemove",boundary,true);
                       }
                       clearInterval(set);
+                      clearInterval(ourkingC);
+                      clearInterval(musicState);
+                      music.pause();
                   }
                 }
                 //判断子弹与敌机碰撞
@@ -408,6 +474,21 @@ function start(){
                             scorelabel.innerHTML=scores;
                             enemys[j].imagenode.src=enemys[j].faceboomimage;
                             enemys[j].faceisdie=true;
+                            if(enemys[j].facekind == 1){
+                                if(diefaceFlag){
+                                    setInterval(toggleSound(dieface1),1);
+                                    diefaceFlag = !diefaceFlag;
+                                }else{
+                                    setInterval(toggleSound(dieface11),1);
+                                    diefaceFlag = !diefaceFlag;
+                                }
+                              
+                            }else if(enemys[j].facekind == 2){
+                                setInterval(toggleSound(dieface2),1);
+                            }else if(enemys[j].facekind == 3){
+                                setInterval(toggleSound(dieface3),1);
+                            }
+                            
                         }
                         //删除子弹
                         mainDiv.removeChild(bullets[k].bulletimage);
@@ -432,16 +513,16 @@ function begin(){
     selfking.imagenode.style.display="block";
     scorediv.style.display="block";
 
-    musicState = setInterval("toggleSound()",1);
+    musicState = setInterval(toggleSound(music),1);
     /*
      调用开始函数
      */
     set=setInterval(start,20);
+    ourkingC = setInterval(ourkingChange,20);
 }
 
-var music = document.getElementById("audio");//获取ID   
  // 为了解决浏览器不能自动播放的问题
- function toggleSound() {
+ function toggleSound(music) {
     if (music.paused) { //判读是否播放  
         music.paused=false;
         music.play(); //没有就播放 

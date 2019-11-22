@@ -13,19 +13,35 @@
     height: 700px;
     background: url(../images/bg1.png) no-repeat;
     background-size: 100% 100%;
+    border-radius: 30px;
+}
+#startdiv div.title{
+    position: absolute;
+    font-size: 40px;
+    background: rgba(255,2555,255,0.5);
+    border-radius: 20px;
+    width: 1000px;
+    height: 500px;
+    line-height: 500px;
+    text-align: center;
+    top: 100px;
+    left: 125px;
 }
 button{
     outline: none;
 }
 #startdiv button{
     position: absolute;
-    bottom: 100px;
+    bottom: 130px;
     left: 50%;
     width: 200px;
     height: 80px;
     line-height: 80px;
     font-size: 20px;
     margin-left: -100px;
+    background: rgba(255,2555,255,0.5);
+    border-radius: 30px;
+    
 }
 #maindiv{
     position: relative;
@@ -35,6 +51,7 @@ button{
     background-size: 100% 100%;
     display: none;
     overflow: hidden;
+    border-radius: 30px;
 }
 #maindiv img{
     position: absolute;
@@ -60,6 +77,25 @@ button{
 audio{
     width:200px;
     height: 50px; 
+}
+#musicdiv{
+    position: absolute;
+    top: 30px;
+    right: 20px;
+    width: 80px;
+    height: 150px;
+}
+#musicdiv img{
+    width: 50px;
+    height: 50px;
+}
+#lastMusic{
+    top: 15px;
+    left: 15px;
+}
+#nextMusic{
+    top: 80px;
+    left: 15px;
 }
 #suspenddiv{
     position: absolute;
