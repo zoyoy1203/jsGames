@@ -20,10 +20,11 @@ var nextMusic = document.getElementById("nextMusic");
 var music = document.getElementById("audio");
 // 获取敌方小黄脸死亡声音
 var dieface1 = document.getElementById("audio1");
-var dieface11 = document.getElementById("audio11");
 var dieface2 = document.getElementById("audio2");
 var dieface3 = document.getElementById("audio3");
-
+var diefaceState1;
+var diefaceState2;
+var diefaceState3;
 // 歌曲列表数组
 var sounds = [
     "sound/Axero - Trip.mp3",
@@ -202,7 +203,6 @@ var ourkingChange = function() {
 var number = 0;  // 控制暂停和开始之间的转换
 var pause = function() {
     if(number==0){
-        console.log("1");
         clearInterval(musicState);
         music.pause();
         suspenddiv.style.display="block";  // 暂停栏目显示
@@ -219,7 +219,6 @@ var pause = function() {
         number=1;
     }
     else{
-        console.log("2");
         musicState = setInterval(toggleSound(music),1);
         suspenddiv.style.display="none";
         if(document.addEventListener){
@@ -438,7 +437,6 @@ function start(){
     }
 
     // 碰撞检测
-    var diefaceFlag = true;
     for(var k=0;k<bulletslen;k++){
         for(var j=0;j<enemyslen;j++){
             //判断碰撞本方飞机
@@ -474,19 +472,24 @@ function start(){
                             scorelabel.innerHTML=scores;
                             enemys[j].imagenode.src=enemys[j].faceboomimage;
                             enemys[j].faceisdie=true;
-                            if(enemys[j].facekind == 1){
-                                if(diefaceFlag){
-                                    setInterval(toggleSound(dieface1),1);
-                                    diefaceFlag = !diefaceFlag;
-                                }else{
-                                    setInterval(toggleSound(dieface11),1);
-                                    diefaceFlag = !diefaceFlag;
+                            if(enemys[j].facekind == 1){  
+                                if(diefaceState1 !=null){
+                                    clearInterval(diefaceState1)
+                                    dieface1.pause();
                                 }
-                              
+                                diefaceState1 = setInterval(toggleSound(dieface1),1);
                             }else if(enemys[j].facekind == 2){
-                                setInterval(toggleSound(dieface2),1);
+                                if(diefaceState2 !=null){
+                                    clearInterval(diefaceState2)
+                                    dieface2.pause();
+                                }
+                                diefaceState2 = setInterval(toggleSound(dieface2),1);
                             }else if(enemys[j].facekind == 3){
-                                setInterval(toggleSound(dieface3),1);
+                                if(diefaceState3 !=null){
+                                    clearInterval(diefaceState3)
+                                    dieface3.pause();
+                                }
+                                diefaceState3 = setInterval(toggleSound(dieface3),1);
                             }
                             
                         }
