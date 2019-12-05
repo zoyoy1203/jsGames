@@ -1,0 +1,17 @@
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box;
+}  
+   
+html, body {
+    height: 100%; 
+    width: 100%; 
+}  
+.content{
+    width: 375px;
+    margin: 0 auto;
+}
+canvas{
+    background-image: linear-gradient(#212121,#3E2723);
+}
