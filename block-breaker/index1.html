@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <style>
+         body{
+                text-align: center;
+            }
+            canvas{
+                border:1px dashed green;
+            }
+        </style>
+    </head>
+    <body>
+         <canvas id="cvs" width="800" height="600"></canvas>
+    <script>
+        var cvs=document.getElementById("cvs");
+        var context=cvs.getContext("2d");
+
+        /*超绚丽的旋转*/
+        var agle=0;
+        context.translate(cvs.width/2-50,cvs.height/2-50)
+        setInterval(function () {
+            //擦除画布，（因为坐标轴旋转的原因，没有擦完全）
+            context.clearRect(-800,-600,800,600);
+            context.rotate(agle);
+            context.strokeRect(0,0,100,100);
+            agle+=0.01;
+        },30)
+
+    </script>
+    </body>
+
+</html>

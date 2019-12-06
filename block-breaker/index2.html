@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body{
+            text-align: center;
+        }
+        canvas{
+            border:1px dashed green;
+        }
+       </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600" style="border:1px solid red"></canvas>
+
+    <script>
+        var canvas=document.getElementById("canvas");
+        var ctx=canvas.getContext("2d");
+
+        // /*超绚丽的旋转*/
+        var agle=0;
+        ctx.translate(canvas.width/2-50,canvas.height/2-50)
+
+         setInterval(function () {
+            //擦除画布，（因为坐标轴旋转的原因，没有擦完全）
+           
+            ctx.clearRect(-400,-300,800,600);
+           
+            for(var i=0;i<=100;i+=parseInt(Math.random()*30)){
+                for(var j =0;j<=100;j+=parseInt(Math.random()*30)){
+                    // ctx.clearRect(0,0,800,600);
+                    agle = parseInt(Math.random()*360)
+                    ctx.rotate(agle*Math.PI/180);
+                    ctx.fillRect(i,j,10,10);
+                    ctx.fill();
+                    ctx.rotate(-agle*Math.PI/180);
+                }
+            }
+    
+        },1000)
+
+        
+
+
+       
+            
+
+    </script>
+</body>
+</html>
