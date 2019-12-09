@@ -3,25 +3,20 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-
-
 var game = {
     canvas : document.getElementById('canvas'),
     ctx : canvas.getContext('2d'),
-    // 获取音效
-    // audioBall : document.getElementById("audioBall"),
-    // audioOver : document.getElementById("audioOver"),
-    // audioBallState: null,
-    // audioOverState: null,
 
     clientWidth:  document.documentElement.clientWidth,
     clientHeight: document.documentElement.clientHeight,
     launcher: new Image(),
     gameOver: new Image(),
-    // ball: new Image(),
+  
     actions: {},  // 存放各个 name:定时器id值   键值对
     launcher_x: document.documentElement.clientWidth/2 - 50/2,
     launcher_y : document.documentElement.clientHeight-60,
+
+    gameFlag: false,
 
     init: function() {
         //根据可视区域大小，判断canvas大小 和 发射器位置
@@ -42,38 +37,22 @@ var game = {
         //游戏结束
         this.gameOver.src = "./image/game_over.png";
 
-        //球图片
-        // this.ball.src = "./image/ball.png";
 
   
     },
 
     start: function() {
+        this.gameFlag = true;
         this.init();
         game.ball.init();
         game.brick.init(); // 砖块群初始化
         this.draw();
-
         this.sounds();
-
-        // audioBall.ontimeupdate=function(){
-        //     if(audioBall.currentTime>=0.1){
-        //         audioBall.pause();
-        //      }
-        // };
-        // setInterval(function(){
-        //    audioBall.currentTime = 0;
-        //    audioBall.play();
-        // },1000);
-
-        // this.canvas.onclick = this.onclick; // canvas上绑定click事件
-        // this.canvas.onmousedown = this.onmousedown;
         this.canvas.addEventListener('mousedown',this.mouseDown,true);//监听鼠标按下
         this.canvas.addEventListener('mousemove',this.mouseMove,false);//监听鼠标移动
-        this.canvas.addEventListener('touchstart',this.touchStart,true);// 移动端触摸开始
+        this.canvas.addEventListener('touchstart',this.mouseDown,true);// 移动端触摸开始
         this.canvas.addEventListener('touchmove',this.touchMove,true); // 移动端触摸移动
 
-   
     },
 
     // 音效
@@ -95,10 +74,10 @@ var game = {
 
     // 创建定时器
     play: function (name, action, interval) {
-        var me = this;
+        var that = this;
         this.actions[name] = setInterval(function () {
             action();
-            me.draw();     // 刷新重绘界面
+            that.draw();     // 刷新重绘界面
         }, interval || 50);
     },
 
@@ -112,122 +91,90 @@ var game = {
     draw: function () {
         this.ctx.clearRect(0, 0,this.clientWidth,this.clientHeight);  // 清空给定矩形内的指定像素
         this.ctx.save();                     // 保存当前状态
-        // console.log(game.brick.bricks)
 
-    
+        // 循环绘制小球
         for(var i=game.ball.balls.length-1; i>=0; i--){
-            game.ball.balls[i].move();
+            game.ball.balls[i].draw();
         }
+
+        // 循环绘制砖块数组
         for(var t=game.brick.bricks.length-1; t>=0; t--){
             for(var j=0;j<8;j++){
-                game.brick.bricks[t][j].move();
-                // console.log(game.brick.bricks[i][j])
+                game.brick.bricks[t][j].draw();
+
+                   // 发射器碰撞到砖块 游戏结束
+                if(game.brick.bricks[t][j].x>game.launcher_x+5 && game.brick.bricks[t][j].x<game.launcher_x+45
+                    && game.brick.bricks[t][j].y>game.launcher_y && game.brick.bricks[t][j].y<game.launcher_y+50
+                    && game.brick.bricks[t][j].num>0){
+                    
+                    this.canvas.removeEventListener('mousemove',this.mouseMove,false);//监听鼠标移动
+                    this.canvas.removeEventListener('touchmove',this.touchMove,true); // 移动端触摸移动
+
+                    clearInterval(game.actions['addBalls']); // 停止定时器
+                    clearInterval(game.actions['removeBalls']); // 停止定时器
+                    clearInterval(game.actions['drawBalls']); // 停止定时器
+                    clearInterval(game.actions['moveBalls']); // 停止定时器
+        
+                    clearInterval(game.actions['addBricks']); // 停止定时器
+                    clearInterval(game.actions['removeBricks']); // 停止定时器
+                    clearInterval(game.actions['drawBricks']); // 停止定时器
+                    clearInterval(game.actions['moveBricks']); // 停止定时器
+
+                    game.over.draw();
+                    game.gameFlag = false;
+
+                    console.log("结束")
+            
+                }
                 
+                // 循环小球数组
                 for(var b=game.ball.balls.length-1; b>=0;b--){
-                    // console.log(game.brick.bricks[t][j].y);
-                    // Math.abs(game.ball.balls[b]-game.brick.bricks[t][j]) < (this.canvas.width/8)
+                    //  小球碰撞到有效砖块
                     if(game.ball.balls[b].y<(game.brick.bricks[t][j].y+game.brick.bricks[t][j].height) && game.ball.balls[b].y>game.brick.bricks[t][j].y
-                        && game.ball.balls[b].x>game.brick.bricks[t][j].x && game.ball.balls[b].x<game.brick.bricks[t][j].x+game.brick.bricks[t][j].width){
+                        && game.ball.balls[b].x>game.brick.bricks[t][j].x && game.ball.balls[b].x<game.brick.bricks[t][j].x+game.brick.bricks[t][j].width
+                        && game.brick.bricks[t][j].num >0){
                         // console.log("碰撞了");
                         var brick_num = game.brick.bricks[t][j].num
-                        if(game.brick.bricks[t][j].num <=0){
-                            continue;
-                        }else{
-                            game.ball.balls.splice(b,1);
-                            if((brick_num-game.score.launcher_power)>0){
-                                game.brick.bricks[t][j].num -= game.score.launcher_power;
-                                game.score.score_sum += game.score.launcher_power;
-                            }else{
-                                console.log("over啦啦啦啦")
-                                
-                                game.brickOver(game.brick.bricks[t][j].x,game.brick.bricks[t][j].y);
-                           
-
-                                game.score.score_sum += brick_num;
-                                game.brick.bricks[t][j].num -= game.score.launcher_power;
-
-                            }
+                        game.ball.balls.splice(b,1);
+                        // 砖块剩余分数计算，游戏总分计算
+                        if((brick_num-game.score.launcher_power)>0){
+                            game.brick.bricks[t][j].num -= game.score.launcher_power;
+                            game.score.score_sum += game.score.launcher_power;
+                        }else{ // 砖块消灭
+                            game.brickOver(game.brick.bricks[t][j].x,game.brick.bricks[t][j].y);
+                            game.score.score_sum += brick_num;
+                            game.brick.bricks[t][j].num -= game.score.launcher_power;
                         }
-                      
-                        
-                    }else{
-                        // console.log("没碰撞");
                     }
+
                 }
 
 
             }
         }
-    
-    
-      
-       
-        // for(var i=0; i<=game.brick.bricks.length-1; i++){
-        //     for(var j=0;j<8;j++){
-        //         game.brick.bricks[i][j].move();
-        //         // console.log(game.brick.bricks[i][j])
-        //     }
-        // }
        
         game.shoot.draw();                   // 绘制发射器
         game.score.draw();                   // 绘制初始化分数
-        game.stop.draw();
         this.ctx.restore();                  // 恢复之前保存的绘图状态
 
     },
 
-    // 点击事件
-    onclick: function(e) {
-        var px = (e.offsetX || (e.clientX - game.canvas.offsetLeft));  // 点击的x坐标
-        var py = (e.offsetY || (e.clientY - game.canvas.offsetTop));  // 点击的x坐标
 
-        if(px>=0 && px<=90 && py>=500 && py<=530){
-            console.log('--------------------');
-            game.stop('addBalls');
-            game.stop('removeBalls');
-            game.stop('drawBalls');
-        }
-
-        var x = px-50/2;
-        game.launcher_x = x;
-        game.draw();
-
-        
-        
-    },
-    // 鼠标点击事件
+    // 鼠标触摸点击开始事件
     mouseDown: function(e) {
-        var px = (e.offsetX || (e.clientX - game.canvas.offsetLeft));  // 点击的x坐标
-        var py = (e.offsetY || (e.clientY - game.canvas.offsetTop));  // 点击的x坐标
+        var px = (e.offsetX || (e.clientX - game.canvas.offsetLeft) ||  e.touches[0].pageX);  // 点击的x坐标
+        var py = (e.offsetY || (e.clientY - game.canvas.offsetTop) || e.touches[0].pageY);  // 点击的Y坐标
         var x = px-50/2;
         game.launcher_x = x;
-        // console.log(game.launcher_x);
         game.draw(); 
 
-        // console.log(px+'--'+py);
-
-
-        //  懵逼状态
-        if(px>=0 && px<=90 && py>=500 && py<=530){
-            // console.log(game.actions)
-            clearInterval(game.actions['addBalls']); // 停止定时器
-            clearInterval(game.actions['removeBalls']); // 停止定时器
-            clearInterval(game.actions['drawBalls']); // 停止定时器
-
-            clearInterval(game.actions['addBricks']); // 停止定时器
-            clearInterval(game.actions['removeBricks']); // 停止定时器
-            clearInterval(game.actions['drawBricks']); // 停止定时器
-
-            // game.ball.balls=[];
-            // game.brick.bricks=[];
-            game.draw();
-            // game.stop('addBalls');
-            // game.stop('removeBalls');
-            // game.stop('drawBalls');
+        if(!game.gameFlag && px > ((game.canvas.width-200)/2) && px < ((game.canvas.width-200)/2+200)
+            && py > ((game.canvas.height-150)/2) && ((game.canvas.height-150)/2)+1500){
+            game.ball.balls = []
+            game.brick.bricks = []
+            game.start();
         }
     },
-
-  
     // 鼠标移动事件
     mouseMove: function(e) {
         var px = (e.offsetX || (e.clientX - game.canvas.offsetLeft));  // 点击的x坐标
@@ -267,7 +214,6 @@ var game = {
         var ctx = game.ctx;
         var agle=0;
 
-        console.log('爆炸-------')
         ctx.save();
         ctx.translate(x,y)
         ctx.clearRect(-game.canvas.width/2,-game.canvas.height/2,game.canvas.width,game.canvas.height);
@@ -290,7 +236,6 @@ var game = {
 
     }
     
-
 }
 
 // 游戏分数的计算和绘制
@@ -342,6 +287,13 @@ game.ball = {
     // 小球添加移除绘制
     init: function () {
         var that = this;
+        game.play('moveBalls',function() {
+            // console.log('moveBalls-------')
+            for(var i=game.ball.balls.length-1; i>=0; i--){
+                game.ball.balls[i].move();
+            }
+        },10)
+
         game.play('addBalls',function(){
             // console.log(that.balls);
             // console.log('添加------------')
@@ -358,15 +310,10 @@ game.ball = {
            }
         },20)
 
-        // game.play('moveBalls',function() {
-        //     for(var i=game.ball.balls.length-1; i>=0; i--){
-        //         game.ball.balls[i].move();
-        //     }
-        // },50)
       
     },
+    
 }
-
 // 发射的小球
 var Ball = function (x, y, color) {
     this.x = x;
@@ -378,7 +325,7 @@ var Ball = function (x, y, color) {
 // 小球移动
 Ball.prototype.move = function() {
     this.y -=5;
-    this.draw();//每次运动之后就要进入画的的下一帧
+    // this.draw();//每次运动之后就要进入画的的下一帧
 }
 // 绘制小球
 Ball.prototype.draw = function () {
@@ -404,11 +351,12 @@ Ball.prototype.draw = function () {
     // ctx.restore();  // 恢复之前保存的绘图状态
 };
 
+
 // 绘制砖块群
 game.brick = {
     bricks: [],
     nums: [0,0,1,3,5,8],
-    colors: ['rgba(255,255,255,0)','rgba(255,255,255,0)','yellow','green','orange','red'],
+    colors: ['rgba(255,255,255,0)','rgba(255,255,255,0)','#FDD835','green','orange','red'],
     init: function(){
         var brick_width = game.canvas.width/8;
         var brick_height = game.canvas.height/20;
@@ -416,6 +364,16 @@ game.brick = {
         console.log(brick_height);
 
         var that = this;
+        game.play('moveBricks',function() {
+            // 循环砖块数组
+            for(var t=game.brick.bricks.length-1; t>=0; t--){
+                for(var j=0;j<8;j++){
+                    game.brick.bricks[t][j].move();                 
+                }
+            }
+
+        },40)
+
         game.play('addBricks',function(){
             var bricks_j=[];
             for(let i=0; i<8;i++){
@@ -440,26 +398,9 @@ game.brick = {
                 }
             }
         },100)
-
-        // 砖块的碰撞检测
-        // game.play('moveBricks',function() {
-        //     for(var i=that.bricks.length-1; i>=0; i--){
-        //        for(var j=0;j<8;j++){
-        //            // 小球循环
-        //            for(var t=0;t<game.ball.balls.length;t++){
-        //                if(Math.abs(game.ball.balls[t]-that.bricks[i][j])>brick_width){
-        //                     console.log("撞到了")
-        //                }else{
-        //                     console.log("没撞到")
-        //                }
-        //            }
-        //        }
-        //     }
-        // },10)
        
     }
 }
-
 //  砖块
 var Bricks = function(x,y,width,height,color,num){
     this.x=x;
@@ -472,18 +413,14 @@ var Bricks = function(x,y,width,height,color,num){
 // 砖块移动
 Bricks.prototype.move = function() {
     this.y +=3;
-    this.draw();//每次运动之后就要进入画的的下一帧
+    // this.draw();//每次运动之后就要进入画的的下一帧
 }
 // 绘制砖块
 Bricks.prototype.draw = function () {
     var ctx = game.ctx;
     ctx.beginPath();  // 开始绘画
-    // console.log(this.color+'---'+this.num)
-    // console.log(this.color+"---"+this.num)
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x,this.y,this.width,this.height);
-    // console.log(this.x+'--'+this.y+'--'+this.color+'--'+this.num)
-
 
     ctx.font = "20px 微软雅黑";  //设置字体
     ctx.strokeStyle = "#fff";
@@ -492,26 +429,27 @@ Bricks.prototype.draw = function () {
     }else{
         this.color = 'rgba(255,255,255,0)';
     }
-    // console.log(this.color+'---'+this.num)
-
 
     ctx.fill();  //内部填充
     ctx.stroke(); //轮廓绘制
 };
 
-game.stop ={
-    draw: function() {
+game.over = {
+    draw() {
         var ctx = game.ctx;
-        // ctx.save();
-        // ctx.clearRect(0, 500, 90, 30); //清空给定矩形内的指定像素。
         ctx.font = "20px 微软雅黑";  //设置字体
         ctx.fillStyle = "#fff";  // 设置字体颜色
-        //在画布上绘制填色的文本
-        ctx.fillText("暂停",0, 510);
+        console.log(game.canvas.width)
+        console.log(this.x)
+        ctx.fillRect((game.canvas.width-200)/2,(game.canvas.height-150)/2,200,150);
+        ctx.strokeStyle = '#000';
+        ctx.strokeText("得分："+game.score.score_sum,(game.canvas.width-200)/2+60, (game.canvas.height-150)/2+40);
+        ctx.strokeText("游戏结束",(game.canvas.width-200)/2+60, (game.canvas.height-150)/2+80);
+        ctx.strokeText("重新开始",(game.canvas.width-200)/2+60, (game.canvas.height-150)/2+130);
         ctx.stroke();   // 开始绘制
-        // ctx.restore();  // 恢复之前保存的绘图状态
-       
+        ctx.fill();
     }
+
 }
 
 game.start();
