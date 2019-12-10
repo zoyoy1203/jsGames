@@ -7,6 +7,8 @@ var game = {
     clientHeight: document.documentElement.clientHeight,
     launcher: new Image(),
     gameOver: new Image(),
+    addSpeed: new Image(),
+    addPower: new Image(),
   
     actions: {},  // 存放各个 name:定时器id值   键值对
     launcher_x: document.documentElement.clientWidth/2 - 50/2,
@@ -36,6 +38,12 @@ var game = {
         //游戏结束
         this.gameOver.src = "./image/game_over.png";
 
+        // 加攻速图片导入
+        this.addSpeed.src = "./image/add_speed.png";
+        //加威力图片导入
+        this.addPower.src = "./image/add_power.png";
+
+
 
   
     },
@@ -45,6 +53,7 @@ var game = {
         this.init();
         game.ball.init();
         game.brick.init(); // 砖块群初始化
+        game.tool.init();
         this.draw();
         this.sounds();
         this.canvas.addEventListener('mousedown',this.mouse_touch_Down);//监听鼠标按下
@@ -94,6 +103,31 @@ var game = {
             game.ball.balls[i].draw();
         }
 
+        // console.log(game.tool.tools)
+        // 循环绘制道具
+        for(var i=game.tool.tools.length-1; i>=0; i--){
+            game.tool.tools[i].draw();
+
+            if(game.tool.tools[i].remove){
+                game.tool.tools.splice(i,1);
+            }
+            // // 碰撞检测
+            // if(game.launcher_x>game.tool.tools[i].x && game.launcher_x<game.tool.tools[i].x+50
+            //     && game.launcher_y >game.tool.tools[i].y && game.launcher_y<game.tool.tools[i].y+60){
+            //     console.log("吃到工具")
+          
+            //     if(game.tool.tools[i].img_i == 0){
+            //         game.score.launcher_power ++;
+            //     }else{
+            //         game.score.launcher_speed ++;
+            //     }
+            //     game.tool.tools.splice(i,1);
+              
+               
+            // }
+        }
+
+
         // 循环绘制砖块数组
         for(var t=game.brick.bricks.length-1; t>=0; t--){
             for(var j=0;j<8;j++){
@@ -117,6 +151,11 @@ var game = {
                     game.stop('removeBricks')
                     game.stop('drawBricks')
                     game.stop('moveBricks')
+
+                    game.stop('addTools')
+                    game.stop('removeTools')
+                    game.stop('drawTools')
+                    game.stop('moveTools')
 
                     clearInterval(game.audioBallState);  // 停止射击音效
                     game.audioBall.pause();
@@ -171,8 +210,6 @@ var game = {
         if(game.gameFlag){
             game.launcher_x = x;
         }else{
-            console.log(px)
-            console.log(py)
             if(px > ((game.canvas.width-200)/2) && px < ((game.canvas.width-200)/2+200)
                 && py > ((game.canvas.height-150)/2) && py<((game.canvas.height-150)/2)+150){
                 console.log((game.canvas.height-150)/2)
@@ -230,7 +267,7 @@ var game = {
 
 // 游戏分数的计算和绘制
 game.score = {
-    launcher_speed: 10,
+    launcher_speed: 5,
     launcher_power: 1,
     score_sum: 0,
     draw: function () {
@@ -267,6 +304,67 @@ game.shoot = {
     }
 }
 
+// 游戏道具图片的绘制
+game.tool = {
+    tools: [],
+      // 小球添加移除绘制
+
+    init: function () {
+        var that = this;
+        game.play('moveTools',function() {
+            for(var i=game.tool.tools.length-1; i>=0; i--){
+                game.tool.tools[i].move();
+            }
+        },40)
+
+        game.play('addTools',function(){
+            that.tools.push(new Tool(game.getRandom(2),game.getRandom(300),30)); // 创建气泡并放入bubbles数组
+        },5000)
+
+        game.play('removeTools',function(){
+            for(var i=that.tools.length-1; i>=0; i--){
+                if(that.tools[i].y>680){
+                    that.tools.splice(i,1);
+                }
+            }
+        },100)
+    }
+}
+
+var Tool = function(img_i,x,y){
+    this.img_i = img_i;
+    var imgs = ["./image/add_power.png","./image/add_speed.png"];
+    this.img = new Image()
+    this.img.src = imgs[img_i];
+    this.x = x;
+    this.y = y;
+    this.remove = false;
+}
+Tool.prototype.move = function() {
+    this.y += 3;
+    // 碰撞检测
+    if(this.y>500 && game.launcher_x>this.x && game.launcher_x<this.x+50
+        && game.launcher_y >this.y && game.launcher_y<this.y+60){
+        console.log("吃到工具")
+
+        if(this.img_i == 0){
+            game.score.launcher_power +=1;
+        }else{
+            game.score.launcher_speed +=2;
+        }
+        this.remove = true;
+    }
+}
+Tool.prototype.draw = function() {
+    var ctx = game.ctx;
+    //  判断图片是否加载完，加载完后再绘制，不然显示不出来
+    var that = this;
+    this.img.onload = function() {
+        ctx.drawImage(that.img,this.x,this.y);
+    }
+    ctx.drawImage(this.img,this.x,this.y);
+}
+
 // 绘制小球
 game.ball = {
     balls: [],
@@ -282,7 +380,7 @@ game.ball = {
 
         game.play('addBalls',function(){
             that.balls.push(new Ball(game.launcher_x+25, game.launcher_y+20, "white")); // 创建气泡并放入bubbles数组
-        },500)
+        },200)
 
         game.play('removeBalls',function(){
            for(var i=that.balls.length-1; i>=0; i--){
@@ -306,7 +404,7 @@ var Ball = function (x, y, color) {
 };
 // 小球移动
 Ball.prototype.move = function() {
-    this.y -=5;
+    this.y -= game.score.launcher_speed;
 }
 // 绘制小球
 Ball.prototype.draw = function () {
