@@ -38,13 +38,6 @@ var game = {
         //游戏结束
         this.gameOver.src = "./image/game_over.png";
 
-        // 加攻速图片导入
-        this.addSpeed.src = "./image/add_speed.png";
-        //加威力图片导入
-        this.addPower.src = "./image/add_power.png";
-
-
-
   
     },
 
@@ -111,20 +104,7 @@ var game = {
             if(game.tool.tools[i].remove){
                 game.tool.tools.splice(i,1);
             }
-            // // 碰撞检测
-            // if(game.launcher_x>game.tool.tools[i].x && game.launcher_x<game.tool.tools[i].x+50
-            //     && game.launcher_y >game.tool.tools[i].y && game.launcher_y<game.tool.tools[i].y+60){
-            //     console.log("吃到工具")
           
-            //     if(game.tool.tools[i].img_i == 0){
-            //         game.score.launcher_power ++;
-            //     }else{
-            //         game.score.launcher_speed ++;
-            //     }
-            //     game.tool.tools.splice(i,1);
-              
-               
-            // }
         }
 
 
@@ -206,14 +186,14 @@ var game = {
         var px = (e.offsetX || (e.clientX - game.canvas.offsetLeft) ||  e.touches[0].pageX);  // 点击的x坐标
         var py = (e.offsetY || (e.clientY - game.canvas.offsetTop) || e.touches[0].pageY);  // 点击的Y坐标
         var x = px-50/2;
-        console.log(game.gameFlag)
+        // console.log(game.gameFlag)
         if(game.gameFlag){
             game.launcher_x = x;
         }else{
             if(px > ((game.canvas.width-200)/2) && px < ((game.canvas.width-200)/2+200)
                 && py > ((game.canvas.height-150)/2) && py<((game.canvas.height-150)/2)+150){
-                console.log((game.canvas.height-150)/2)
-                console.log(((game.canvas.height-150)/2)+150)
+                // console.log((game.canvas.height-150)/2)
+                // console.log(((game.canvas.height-150)/2)+150)
                 game.ball.balls = []
                 game.brick.bricks = []
                 game.start();
@@ -258,8 +238,6 @@ var game = {
         }
 
         ctx.restore();
-    
-     
 
     }
     
@@ -300,7 +278,6 @@ game.shoot = {
             ctx.drawImage(game.launcher, game.launcher_x,game.launcher_y);
         }
         ctx.drawImage(game.launcher, game.launcher_x,game.launcher_y);
-       
     }
 }
 
@@ -308,7 +285,6 @@ game.shoot = {
 game.tool = {
     tools: [],
       // 小球添加移除绘制
-
     init: function () {
         var that = this;
         game.play('moveTools',function() {
@@ -332,10 +308,7 @@ game.tool = {
 }
 
 var Tool = function(img_i,x,y){
-    this.img_i = img_i;
-    var imgs = ["./image/add_power.png","./image/add_speed.png"];
-    this.img = new Image()
-    this.img.src = imgs[img_i];
+    this.i = img_i;
     this.x = x;
     this.y = y;
     this.remove = false;
@@ -346,7 +319,6 @@ Tool.prototype.move = function() {
     if(this.y>500 && game.launcher_x>this.x && game.launcher_x<this.x+50
         && game.launcher_y >this.y && game.launcher_y<this.y+60){
         console.log("吃到工具")
-
         if(this.img_i == 0){
             game.score.launcher_power +=1;
         }else{
@@ -357,12 +329,14 @@ Tool.prototype.move = function() {
 }
 Tool.prototype.draw = function() {
     var ctx = game.ctx;
-    //  判断图片是否加载完，加载完后再绘制，不然显示不出来
-    var that = this;
-    this.img.onload = function() {
-        ctx.drawImage(that.img,this.x,this.y);
+    ctx.beginPath();  // 开始绘画
+    if(this.i==0){   // 加威力
+        ctx.fillStyle = "#FF0000";
+    }else{ // 加攻速
+        ctx.fillStyle = "#00BFFF";
     }
-    ctx.drawImage(this.img,this.x,this.y);
+    ctx.arc(this.x, this.y,10, 0, Math.PI * 2); 
+    ctx.fill();  //内部填充
 }
 
 // 绘制小球
@@ -376,11 +350,11 @@ game.ball = {
             for(var i=game.ball.balls.length-1; i>=0; i--){
                 game.ball.balls[i].move();
             }
-        },10)
+        },50/game.score.launcher_speed)
 
         game.play('addBalls',function(){
             that.balls.push(new Ball(game.launcher_x+25, game.launcher_y+20, "white")); // 创建气泡并放入bubbles数组
-        },200)
+        },1000/game.score.launcher_speed)
 
         game.play('removeBalls',function(){
            for(var i=that.balls.length-1; i>=0; i--){
@@ -404,7 +378,7 @@ var Ball = function (x, y, color) {
 };
 // 小球移动
 Ball.prototype.move = function() {
-    this.y -= game.score.launcher_speed;
+    this.y -= 5
 }
 // 绘制小球
 Ball.prototype.draw = function () {
@@ -507,5 +481,4 @@ game.over = {
     }
 
 }
-
 game.start();
